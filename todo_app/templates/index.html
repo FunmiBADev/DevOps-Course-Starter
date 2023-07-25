@@ -12,7 +12,56 @@
       <h2>Items</h2>
       <ul class="list-group mb-4">
         <!-- List the todo items here -->
+        {% for item in items %}
+          <li>
+            {{ item.id }} - {{ item.title }} - {{ item.status }}
+          </li>
+        {% endfor %}
       </ul>
     </div>
   </div>
+  <br>
+  <div>
+  <form action="/additem" method="post" class="form-example">
+    <div class="form-example">
+      <p class="lead">Add new task</p>
+      <label for="name">Item Description: </label>
+      <input type="text" name="title" id="title" required>
+    </div>
+    <div class="form-example">
+      <input type="submit" class="btn btn-primary" value="Submit">
+    </div>
+  </form>
+</div>
+
+</br>
+
+<div>
+  <form action="/completeitem" method="post" class="form-example">
+    <div class="form-example">
+      <p class="lead">Update task status</p>
+      <label for="name">Enter item Id: </label>
+      <input type="text" name="id" id="id" required>
+    </div>
+    <div class="form-example">
+      <input type="submit" class="btn btn-success" value="Complete">
+    </div>
+  </form> 
+</div>
+<br/>
+<div>
+
+  <form action="/removeitem" method="post" class="form-example">
+    <div class="form-example">
+      <label for="name">Enter item Id: </label>
+      <input type="text" name="id" id="id" required>
+    </div>
+    <div class="form-example">
+      <input type="submit" class="btn btn-danger" value="Delete">
+  
+    </div>
+  </form>
+</div>
+
+
 {% endblock %}
