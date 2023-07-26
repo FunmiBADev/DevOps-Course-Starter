@@ -10,58 +10,75 @@
   <div class="row">
     <div class="col-md-12">
       <h2>Items</h2>
-      <ul class="list-group mb-4">
-        <!-- List the todo items here -->
-        {% for item in items %}
-          <li>
-            {{ item.id }} - {{ item.title }} - {{ item.status }}
-          </li>
-        {% endfor %}
-      </ul>
+      <br>
+      <!-- Add New Task Button -->
+      <div class="text-right">
+         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addTaskModal">Add New Task
+         </button>
+        </div>
+      </br>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Task</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- List the todo items here -->
+          {% for item in items %}
+            <tr>
+              <td>{{ item.id }}</td>
+              <td>{{ item.title }}</td>
+              <td>{{ item.status }}</td>
+              <td>
+                <form action="/completeitem" method="post" class="form-example">
+                  <input type="hidden" name="id" value="{{ item.id }}">
+                  <input type="submit" class="btn btn-success" value="Complete">
+                </form>
+  
+                <form action="/removeitem" method="post" class="form-example">
+                  <input type="hidden" name="id" value="{{ item.id }}">
+                  <input type="submit" class="btn btn-danger" value="Delete">
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+
   </div>
   <br>
-  <div>
-  <form action="/additem" method="post" class="form-example">
-    <div class="form-example">
-      <p class="lead">Add new task</p>
-      <label for="name">Item Description: </label>
-      <input type="text" name="title" id="title" required>
-    </div>
-    <div class="form-example">
-      <input type="submit" class="btn btn-primary" value="Submit">
-    </div>
-  </form>
-</div>
-
-</br>
-
-<div>
-  <form action="/completeitem" method="post" class="form-example">
-    <div class="form-example">
-      <p class="lead">Update task status</p>
-      <label for="name">Enter item Id: </label>
-      <input type="text" name="id" id="id" required>
-    </div>
-    <div class="form-example">
-      <input type="submit" class="btn btn-success" value="Complete">
-    </div>
-  </form> 
-</div>
-<br/>
-<div>
-
-  <form action="/removeitem" method="post" class="form-example">
-    <div class="form-example">
-      <label for="name">Enter item Id: </label>
-      <input type="text" name="id" id="id" required>
-    </div>
-    <div class="form-example">
-      <input type="submit" class="btn btn-danger" value="Delete">
   
+  <!-- Modal -->
+<div class="modal fade" id="addTaskModal" tabindex="-1" role="dialog" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/additem" method="post">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="title">Item Description:</label>
+            <input type="text" name="title" id="title" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <input type="submit" class="btn btn-primary" value="Submit">
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>
+
 
 
 {% endblock %}
