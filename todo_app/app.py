@@ -1,44 +1,48 @@
-from flask import Flask
-from flask import request
-from flask import redirect
-from flask import url_for
-from flask import render_template
-
-from todo_app.flask_config import Config
-
-from todo_app.data.session_items import get_items, get_item, add_item, save_item, remove_item
-
-
-from operator import itemgetter, attrgetter
+from flask import Flask, request, redirect, url_for, render_template
+from todo_app.data.trello_items import  TrelloManager
+from todo_app.trello_config import TrelloStaticDataConfig
 
 app = Flask(__name__)
-app.config.from_object(Config())
-
+trello_manager = TrelloManager()  # Create a single TrelloManager instance
 
 @app.route('/')
 def index():
-    items = get_items()
-    # sort the items before displaying them
-    items = sorted(items, key=lambda x: x['status'], reverse=True)
+    items = trello_manager.get_items()
     return render_template('index.html', items=items)
 
 @app.route('/additem', methods=['POST'])
 def additem():
     title = request.form.get('title')
-    add_item(title)
+    desc = request.form.get('description')
+    trello_manager.create_card(title, desc)
+    # add_item(title, description)
     return redirect(url_for('index'))
 
-@app.route('/completeitem', methods=['POST'])
-def completeitem():
-    id = request.form.get('id')
-    item = get_item(id)
-    item['status'] = "Completed"
-    save_item(item)
-    return redirect(url_for('index'))
+@app.route('/mark_complete/<card_id>', methods=['POST'])
+def mark_card_done(card_id):
+    try:
+        list_id_done = TrelloStaticDataConfig.TRELLO_DONE  # Replace with the desired list ID for "Done"
+        trello_manager.update_item_status(card_id, list_id_done)
+        return redirect(url_for('index'))
+    except Exception as e:
+        return f"Failed to mark card complete {str(e)}"
 
-@app.route('/removeitem', methods=['POST'])
-def removeitem():
-    id = request.form.get('id')
-    # item = get_item(id)
-    remove_item(id)
-    return redirect(url_for('index'))
+@app.route('/mark_progress/<card_id>', methods=['POST'])
+def mark_card_progress(card_id):
+    try:
+        list_id_progress = TrelloStaticDataConfig.TRELLO_IN_PROGRESS  # Replace with the desired list ID for "Progress"
+        trello_manager.update_item_status(card_id, list_id_progress)
+        return redirect(url_for('index'))
+    except Exception as e:
+        return f"Failed to progress card status: {str(e)}"
+
+@app.route('/removeitem/<card_id>', methods=['POST'])
+def removeitem(card_id):
+    try:
+        trello_manager.delete_card(card_id)
+        return redirect(url_for('index'))
+    except Exception as e:
+        return f"Failed to delete card: {str(e)}"
+
+if __name__ == "__main__":
+    app.run(debug=True)

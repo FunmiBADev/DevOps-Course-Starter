@@ -2,6 +2,42 @@
 
 > If you are using GitPod for the project exercise (i.e. you cannot use your local machine) then you'll want to launch a VM using the [following link](https://gitpod.io/#https://github.com/CorndelWithSoftwire/DevOps-Course-Starter). Note this VM comes pre-setup with Python & Poetry pre-installed.
 
+# Getting started for Project Exercise 2
+
+For universal access to our To Do items - we will be saving our Items in Trello using REST API calls. To get started:
+
+1. Register for a if you do not have one already [Trello account](https://trello.com/signup)
+
+2. Generate an API Key and Token [here](https://trello.com/app-key)
+
+3. Add Handy PowerUp App [API Developer ID Helper](https://trello.com/power-ups) to help with extracting board and List IDs.
+
+4. Save these credentials and IDs by updating the`.env` file from exercise 1:
+
+   ```
+   # Trello Api Management
+   TRELLO_API_KEY=<FILL ME>
+   TRELLO_TOKEN=<FILL ME>
+   BOARD_ID=<FILL ME>
+   TRELLO_DONE=<FILL ME>
+   TRELLO_IN_PROGRESS=<FILL ME>
+   TRELLO_TO_DO=<FILL ME>
+   BASE_URL='https://api.trello.com/1/'
+
+   ```
+
+5. The project uses a virtual environment to isolate package dependencies. To create the virtual environment and install the newly added `requests` packages, run the following from your preferred shell:
+
+```bash
+$ poetry install
+```
+
+6. Once the all dependencies have been installed, start the Flask app in development mode within the Poetry environment by running:
+
+```bash
+$ poetry run flask run
+```
+
 ## System Requirements
 
 The project uses poetry for Python to create an isolated environment and manage package dependencies. To prepare your system, ensure you have an official distribution of Python version 3.8+ and install Poetry using one of the following commands (as instructed by the [poetry documentation](https://python-poetry.org/docs/#system-requirements)):
@@ -37,11 +73,13 @@ The `.env` file is used by flask to set environment variables when running `flas
 ## Running the App
 
 Once the all dependencies have been installed, start the Flask app in development mode within the Poetry environment by running:
+
 ```bash
 $ poetry run flask run
 ```
 
 You should see output similar to the following:
+
 ```bash
  * Serving Flask app "app" (lazy loading)
  * Environment: development
@@ -51,4 +89,5 @@ You should see output similar to the following:
  * Debugger is active!
  * Debugger PIN: 226-556-590
 ```
+
 Now visit [`http://localhost:5000/`](http://localhost:5000/) in your web browser to view the app.
