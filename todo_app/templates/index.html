@@ -20,31 +20,40 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Task</th>
             <th>Status</th>
+            <th>Description</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <!-- List the todo items here -->
           {% for item in items %}
-            <tr>
-              <td>{{ item.id }}</td>
-              <td>{{ item.title }}</td>
-              <td>{{ item.status }}</td>
-              <td>
-                <form action="/completeitem" method="post" class="form-example">
-                  <input type="hidden" name="id" value="{{ item.id }}">
+          <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.status }}</td>
+            <td>{{ item.description }}</td>
+            <td>
+              <form action="/mark_complete/{{item.id}}" method="post" class="form-example">
+                <input type="hidden" name="id" value="{{ item.id }}">
+                {% if item.status == "To do" %}
+                  <input type="submit" class="btn btn-success" name="mark_done"value="Complete">
+                </form>
+                  <form action="/mark_progress/{{item.id}}" method="post" class="form-example">
+                  <input type="submit" class="btn btn-info" name="in_progress" value="In Progress">
+                </form>
+                {% elif item.status == "In Progress" %}
                   <input type="submit" class="btn btn-success" value="Complete">
-                </form>
-  
-                <form action="/removeitem" method="post" class="form-example">
-                  <input type="hidden" name="id" value="{{ item.id }}">
-                  <input type="submit" class="btn btn-danger" value="Delete">
-                </form>
-              </td>
-            </tr>
+                {% elif item.status == "Done" %}
+                  <input type="submit" class="btn btn-secondary" name="undo" value="Done" disabled>
+                {% endif %}
+              </form>
+              <form action="/removeitem/{{item.id}}" method="post" class="form-example">
+                <input type="hidden" name="id" value="{{ item.id }}">
+                <input type="submit" class="btn btn-danger" value="Delete">
+              </form>
+            </td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
@@ -66,9 +75,12 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="title">Item Description:</label>
-            <input type="text" name="title" id="title" class="form-control" required>
-          </div>
+            <label for="title">Item Title:</label>
+            <input type="text" name="title" id="title" placeholder="Required" class="form-control" required>
+            <div class="form-group">
+              <label for="description">Item Description:</label>
+              <input type="text" name="description" id="description" placeholder="Optional" class="form-control">
+            </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
