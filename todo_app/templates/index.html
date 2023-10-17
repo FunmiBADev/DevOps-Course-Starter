@@ -17,6 +17,10 @@
          </button>
         </div>
       </br>
+     
+      <br>
+      <!-- Table for To Do Items -->
+      <h3>To Do Items</h3>
       <table class="table table-striped">
         <thead>
           <tr>
@@ -27,12 +31,59 @@
           </tr>
         </thead>
         <tbody>
-          <!-- List the todo items here -->
-          {% for item in items %}
-          <tr>
+          <!-- List To Do items here -->
+          {% for item in view_model.todo_items %}
+          <tr data-status="{{ item.status }}">
             <td>{{ item.name }}</td>
             <td>{{ item.status }}</td>
             <td>{{ item.description }}</td>
+              <!-- Action buttons for To Do items -->
+              <td>
+                <form action="/mark_complete/{{item.id}}" method="post" class="form-example">
+                  <input type="hidden" name="id" value="{{ item.id }}">
+                  {% if item.status == "To do" %}
+                    <input type="submit" class="btn btn-success" name="mark_done"value="Complete">
+                  </form>
+                    <form action="/mark_progress/{{item.id}}" method="post" class="form-example">
+                    <input type="submit" class="btn btn-info" name="in_progress" value="In Progress">
+                  </form>
+                  {% elif item.status == "In Progress" %}
+                    <input type="submit" class="btn btn-success" value="Complete">
+                  {% elif item.status == "Done" %}
+                    <input type="submit" class="btn btn-secondary" name="undo" value="Done" disabled>
+                  {% endif %}
+                </form>
+                <form action="/removeitem/{{item.id}}" method="post" class="form-example">
+                  <input type="hidden" name="id" value="{{ item.id }}">
+                  <input type="submit" class="btn btn-danger" value="Delete">
+                </form>
+              </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </br>
+     
+    <br>
+    <!-- Table for In Progress Items -->
+    <h3>In Progress Items</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Status</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- List To Do items here -->
+        {% for item in view_model.progress_items %}
+        <tr data-status="{{ item.status }}">
+          <td>{{ item.name }}</td>
+          <td>{{ item.status }}</td>
+          <td>{{ item.description }}</td>
+            <!-- Action buttons for In Progress items -->
             <td>
               <form action="/mark_complete/{{item.id}}" method="post" class="form-example">
                 <input type="hidden" name="id" value="{{ item.id }}">
@@ -53,14 +104,60 @@
                 <input type="submit" class="btn btn-danger" value="Delete">
               </form>
             </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-  </div>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </br>
+     
   <br>
+  <!-- Table for Done Items -->
+  <h3>Done Items</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Task</th>
+        <th>Status</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- List To Do items here -->
+      {% for item in view_model.done_items %}
+      <tr data-status="{{ item.status }}">
+        <td>{{ item.name }}</td>
+        <td>{{ item.status }}</td>
+        <td>{{ item.description }}</td>
+      
+          <!-- Action buttons for Done items -->
+          <td>
+            <form action="/mark_complete/{{item.id}}" method="post" class="form-example">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              {% if item.status == "To do" %}
+                <input type="submit" class="btn btn-success" name="mark_done"value="Complete">
+              </form>
+                <form action="/mark_progress/{{item.id}}" method="post" class="form-example">
+                <input type="submit" class="btn btn-info" name="in_progress" value="In Progress">
+              </form>
+              {% elif item.status == "In Progress" %}
+                <input type="submit" class="btn btn-success" value="Complete">
+              {% elif item.status == "Done" %}
+                <input type="submit" class="btn btn-secondary" name="undo" value="Done" disabled>
+              {% endif %}
+            </form>
+            <form action="/removeitem/{{item.id}}" method="post" class="form-example">
+              <input type="hidden" name="id" value="{{ item.id }}">
+              <input type="submit" class="btn btn-danger" value="Delete">
+            </form>
+          </td>
+        
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</br>
+ 
   
   <!-- Modal -->
 <div class="modal fade" id="addTaskModal" tabindex="-1" role="dialog" aria-labelledby="addTaskModalLabel" aria-hidden="true">

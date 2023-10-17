@@ -6,10 +6,11 @@ class TodoItem:
         self.description = description
 
     @classmethod
-    def trello_card(cls, card: dict, list: dict) -> 'TodoItem':
+    def from_trello_card(cls, card: dict, list: dict) -> 'TodoItem':
         return cls(
             id=card['id'],
             name=card['name'],
             status=list['name'],
-            description=card.get('desc', '')  # Handle the possibility of 'description' not being present
+            # Handle the possibility of 'description' not being present
+            description=card.get('desc', '')
         )
