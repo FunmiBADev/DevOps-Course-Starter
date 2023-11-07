@@ -2,7 +2,7 @@
 
 > If you are using GitPod for the project exercise (i.e. you cannot use your local machine) then you'll want to launch a VM using the [following link](https://gitpod.io/#https://github.com/CorndelWithSoftwire/DevOps-Course-Starter). Note this VM comes pre-setup with Python & Poetry pre-installed.
 
-# Getting started for Project Exercise 2
+# Getting started with the Project
 
 For universal access to our To Do items - we will be saving our Items in Trello using REST API calls. To get started:
 
@@ -36,6 +36,14 @@ $ poetry install
 
 ```bash
 $ poetry run flask run
+```
+
+# Running project test
+
+To run the test in the project - at the root folder run the following command:
+
+```bash
+$ poetry run pytest
 ```
 
 ## System Requirements
