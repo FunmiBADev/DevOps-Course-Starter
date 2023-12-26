@@ -29,8 +29,9 @@ class StubResponse():
 
 
 def get_mock_trello(url, params={}):
+    BOARD_ID = os.environ.get('BOARD_ID')
     # The expected URL should match the URL format used in your application
-    expected_url = f'https://api.trello.com/1/boards/64f6582da14testb49e12999999/lists'
+    expected_url = f'https://api.trello.com/1/boards/{BOARD_ID}/lists'
 
     if url == expected_url:
         return get_mock_trello_cards()

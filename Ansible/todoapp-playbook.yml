@@ -1,0 +1,75 @@
+- name: Run Todo App
+  hosts: webservers
+  remote_user: ec2-user
+
+  vars_prompt:
+  - name: trello_api_key 
+    prompt: Enter your trello api key?
+    private: no
+
+  - name: trello_token
+    prompt: Enter your trello token?
+    private: no
+
+  - name: secret_key
+    prompt: Enter your secret key?
+    private: no 
+
+  tasks:
+  - name: install latest version of git
+    ansible.builtin.yum:
+      name: git
+      state: latest
+    become: yes # become root user, elevating your priviledge to sudo
+
+  - name: install python3
+    ansible.builtin.yum:
+      name: python3
+      state: latest
+    become: yes
+
+  - name: install poetry
+    ansible.builtin.shell:
+      cmd: 'curl -sSL https://install.python-poetry.org | python3 -'
+    become: yes
+    args:
+      creates: ~/.local/bin/poetry
+
+  - name: create directory for app if it does not exist
+    ansible.builtin.file:
+      path: /opt/todoapp
+      state: directory
+      owner: ec2-user
+    become: yes
+
+  - name: clone reop and checkout the code branch with git
+    ansible.builtin.git:
+      dest: /opt/todoapp
+      version: 'module-4'
+      repo: 'https://github.com/FunmiBADev/DevOps-Course-Starter'
+    become: yes
+
+  - name: install dependencies using poetry
+    ansible.builtin.shell: 
+      chdir: /opt/todoapp
+      cmd: ~/.local/bin/poetry install
+    become: yes
+
+  - name: create env from template
+    ansible.builtin.template:
+      src: .env.j2
+      dest: /opt/todoapp/.env
+    become: yes
+
+  - name: copy todoapp service to managed hosts
+    ansible.builtin.copy:
+      src: todoapp.service
+      dest: '/etc/systemd/system/todoapp.service'
+    become: yes
+
+  - name: start todoapp service 
+    ansible.builtin.systemd:
+      name: todoapp.service
+      daemon_reload: true
+      state: restarted
+    become: yes
