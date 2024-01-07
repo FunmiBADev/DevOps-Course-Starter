@@ -99,3 +99,80 @@ You should see output similar to the following:
 ```
 
 Now visit [`http://localhost:5000/`](http://localhost:5000/) in your web browser to view the app.
+
+# Controller Node - Host management using Ansible
+
+1. Install Ansible by running:
+
+```bash
+$ brew install ansible
+```
+
+Or Use pip install
+
+```bash
+$ pip install ansible
+```
+
+2. Ensure ansible installation is successfull by running
+
+```bash
+$ ansible --version
+```
+
+3. In VS Code install the following extension -> Remote - SSH for convinently managing ssh connections and files
+
+4. Have availalble your controller and managed nodes IP and Passwords
+
+5. In VS code with Remote - SSH extention now installed:
+
+   - click on the Remote Explorer icon
+   - on the SSH tab click on the '+' icon to connect to the Controller Node:
+     - enter: ssh ec2-user@<controller-ip-address>
+     - then enter password
+
+6. Once connected to the Controller Node run the following command then enter password when prompted:
+
+```bash
+$ ssh-keygen
+```
+
+7. Then run the following command:
+
+```bash
+$ ssh-copy-id ec2-user@<controller-ip-address>
+```
+
+8. To grant the Controller Node Permission to read and write to the Managed hosts, do the following from the controller node terminal for each individual host you have:
+
+   - enter: ssh ec2-user@<host-ip-address>
+   - then enter password
+   - finally ssh-copy-id ec2-user@<host-ip-address>
+
+9. With the necessary permissions granted in the Remote File explorer if the Ansible folder is mssing you can at the stage copy and paste the ansible folder from the code base as well as the .env.js file to the controller node.
+
+10. to test connection from the controller node to the managed hosts run the following command:
+
+```bash
+$ ansible webservers -i  inventory.ini -m ping
+```
+
+A sucessful connection should return the following
+
+```bash
+[WARNING]: Platform linux on host 18.170.243.22 is using the discovered Python interpreter at /usr/bin/python3.9, but future installation of another Python interpreter could change the meaning
+of that path. See https://docs.ansible.com/ansible-core/2.15/reference_appendices/interpreter_discovery.html for more information.
+18.170.243.22 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3.9"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+```
+
+11. With connection successfully tested - run the the following ansible command to excute all task in the playbook:
+
+```bash
+$ ansible-playbook todoapp-playbook.yml -i inventory.ini
+```

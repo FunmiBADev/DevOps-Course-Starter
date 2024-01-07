@@ -47,10 +47,6 @@
                     <form action="/mark_progress/{{item.id}}" method="post" class="form-example">
                     <input type="submit" class="btn btn-info" name="in_progress" value="In Progress">
                   </form>
-                  {% elif item.status == "In Progress" %}
-                    <input type="submit" class="btn btn-success" value="Complete">
-                  {% elif item.status == "Done" %}
-                    <input type="submit" class="btn btn-secondary" name="undo" value="Done" disabled>
                   {% endif %}
                 </form>
                 <form action="/removeitem/{{item.id}}" method="post" class="form-example">
@@ -87,16 +83,9 @@
             <td>
               <form action="/mark_complete/{{item.id}}" method="post" class="form-example">
                 <input type="hidden" name="id" value="{{ item.id }}">
-                {% if item.status == "To do" %}
-                  <input type="submit" class="btn btn-success" name="mark_done"value="Complete">
-                </form>
-                  <form action="/mark_progress/{{item.id}}" method="post" class="form-example">
-                  <input type="submit" class="btn btn-info" name="in_progress" value="In Progress">
-                </form>
-                {% elif item.status == "In Progress" %}
+
+                {% if item.status == "In Progress" %}
                   <input type="submit" class="btn btn-success" value="Complete">
-                {% elif item.status == "Done" %}
-                  <input type="submit" class="btn btn-secondary" name="undo" value="Done" disabled>
                 {% endif %}
               </form>
               <form action="/removeitem/{{item.id}}" method="post" class="form-example">
@@ -134,15 +123,7 @@
           <td>
             <form action="/mark_complete/{{item.id}}" method="post" class="form-example">
               <input type="hidden" name="id" value="{{ item.id }}">
-              {% if item.status == "To do" %}
-                <input type="submit" class="btn btn-success" name="mark_done"value="Complete">
-              </form>
-                <form action="/mark_progress/{{item.id}}" method="post" class="form-example">
-                <input type="submit" class="btn btn-info" name="in_progress" value="In Progress">
-              </form>
-              {% elif item.status == "In Progress" %}
-                <input type="submit" class="btn btn-success" value="Complete">
-              {% elif item.status == "Done" %}
+              {% if item.status == "Done" %}
                 <input type="submit" class="btn btn-secondary" name="undo" value="Done" disabled>
               {% endif %}
             </form>
