@@ -176,3 +176,27 @@ of that path. See https://docs.ansible.com/ansible-core/2.15/reference_appendice
 ```bash
 $ ansible-playbook todoapp-playbook.yml -i inventory.ini
 ```
+
+# Run Todo App in Docker container in Dev and Prod Environments
+
+1. To make sure the newly added 'gunicorn' dependency is installed, run:
+
+```bash
+$ poetry install
+```
+
+2. To run on the dev environment use:
+
+```bash
+$ docker-compose up
+```
+
+3. To run on the prod environment use:
+
+```bash
+$ docker build --target production --tag todo-app:prod .
+```
+
+```bash
+$ docker run -p 3000:3000 --env-file .env todo-app:prod
+```
