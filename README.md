@@ -200,3 +200,62 @@ $ docker build --target production --tag todo-app:prod .
 ```bash
 $ docker run -p 3000:3000 --env-file .env todo-app:prod
 ```
+
+# Test Container
+
+The test container is used to run the unit and integration tests for the To Do App. To build the test container, run the following command:
+
+```bash
+$ docker build --target test --tag todo-app:test .
+```
+
+```bash
+$ run: docker run --env-file ./.env.test todo-app:test
+```
+## Manual Deployment
+Find the Docker images for this project [here](https://hub.docker.com/repository/docker/funmibadev/todo-app/tags).
+
+### Release Docker Image to DockerHub
+To release the Docker image to DockerHub, you first need to build the production container using the following command:
+```bash
+$ docker build --target production --tag funmibadev/todo-app:dev .
+```
+Then you need to push the image to docker using the following command:
+```bash
+$ docker push funmibadev/todo-app:dev
+```
+### Deploy App on Azure
+
+#### Create WebApp:
+##### Portal:
+- Create a Resource -> Web App
+- Select your Project Exercise resource group.
+- In the “Publish” field, select “Docker Container”
+- Under “App Service Plan”, it should default to creating a new one, which is correct. Just change the “Sku and size” to “B1”.
+- On the next screen, select Docker Hub in the “Image Source” field, and enter the details of your image.
+
+##### CLI:
+- First create an App Service Plan: az appservice plan create --resource-group <resource_group_name> -n <appservice_plan_name> --sku B1 --is-linux
+- Then create the Web App: az webapp create --resource-group <resource_group_name> --plan <appservice_plan_name> --name <webapp_name> --deployment-container-image-name docker.io/<dockerhub_username>/<container-image-name>:<tagname>
+
+#### Set up Environment Variables:
+##### Portal:
+- Settings -> Configuration in the Portal
+- Add all the environment variables as “New application setting” as available in the .env file
+
+##### CLI:
+- Enter them individually via az webapp config appsettings set -g <resource_group_name> -n <webapp_name> --settings FLASK_APP=todo_app/app.
+
+#### Find the Webhook URL:
+The Webhook URL is located under Deployment Center on the app service’s page in the Azure portal.
+#### Test the Webhook:
+Copy the webhook URL and add in a backslash to escape the `$`. Run the following command replacing `<webhook>` with the actual webhook:
+```bash
+$ curl -dH -X POST "<webhook>"
+```
+It should look as follows:
+```bash
+$ curl -dH -X POST "https://\$<deployment_username>:<deployment_password>@<webapp_name>.scm.azurewebsites.net/docker/hook"
+```
+Upon successfully triggering the webhook, you should receive a link to a log-stream related to the re-pulling of the image and restarting the app.
+Find the deployed website [here](https://funmitodoapp.azurewebsites.net/).
