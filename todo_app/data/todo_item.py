@@ -6,11 +6,10 @@ class TodoItem:
         self.description = description
 
     @classmethod
-    def from_trello_card(cls, card: dict, list: dict) -> 'TodoItem':
+    def from_mongodb_doc(cls, doc: dict) -> 'TodoItem':
         return cls(
-            id=card['id'],
-            name=card['name'],
-            status=list['name'],
-            # Handle the possibility of 'description' not being present
-            description=card.get('desc', '')
+            id=str(doc['_id']),
+            name=doc['name'],
+            status=doc['status'],
+            description=doc.get('description', '')
         )

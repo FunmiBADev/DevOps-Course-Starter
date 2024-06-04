@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import List
 
-
 class ItemStatus(Enum):
     DONE = 'Done'
     TODO = 'To do'
