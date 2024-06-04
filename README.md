@@ -4,29 +4,67 @@
 
 # Getting started with the Project
 
-For universal access to our To Do items - we will be saving our Items in Trello using REST API calls. To get started:
+For universal access to our To Do items - we will be saving our Items in Mongo DB using REST API calls. To get started:
 
-1. Register for a if you do not have one already [Trello account](https://trello.com/signup)
+### Create a MongoDB database using Azure CosmosDB
 
-2. Generate an API Key and Token [here](https://trello.com/app-key)
+- Log into Azure and create a new CosmosDB instance in your Project Exercise resource group:
 
-3. Add Handy PowerUp App [API Developer ID Helper](https://trello.com/power-ups) to help with extracting board and List IDs.
+##### Portal:
 
-4. Save these credentials and IDs by updating the`.env` file from exercise 1:
+- New -> CosmosDB Database
+- Select “Azure Cosmos DB API for MongoDB”
+- Choose “Serverless” for Capacity mode
+- You can also configure secure firewall connections here, but for now you should permit access from “All Networks” to enable easier testing of the integration with the app.
 
-   ```
-   # Trello Api Management
-   TRELLO_API_KEY=<FILL ME>
-   TRELLO_TOKEN=<FILL ME>
-   BOARD_ID=<FILL ME>
-   TRELLO_DONE=<FILL ME>
-   TRELLO_IN_PROGRESS=<FILL ME>
-   TRELLO_TO_DO=<FILL ME>
-   BASE_URL='https://api.trello.com/1/'
+##### CLI:
 
-   ```
+- First login using 'az login' command in the terminal
+- Create a new CosmosDB Account with the following command:
+  - Note: Be sure to replace resourceGroupName and cosmosDbAccountName:
 
-5. The project uses a virtual environment to isolate package dependencies. To create the virtual environment and install the newly added `requests` packages, run the following from your preferred shell:
+```bash
+            resourceGroupName="myResourceGroup"
+            cosmosDbAccountName="myCosmosDBAccount"
+            location="uksouth"
+
+            az cosmosdb create \
+               --name $cosmosDbAccountName \
+               --resource-group $resourceGroupName \
+               --locations regionName=$location \
+               --default-consistency-level Eventual \
+               --kind MongoDB \
+               --server-version 3.6 \
+               --capabilities EnableServerless
+```
+
+- Then create new a MongoDB database under that account with the following command:
+  - Note: Be sure to replace databaseName, resourceGroupName and cosmosDbAccountName:
+
+```bash
+            resourceGroupName="myResourceGroup"
+            cosmosDbAccountName="myCosmosDBAccount"
+            databaseName="myDataBaseName"
+
+            az cosmosdb mongodb database create \
+               --account-name $cosmosDbAccountName \
+               --resource-group $resourceGroupName \
+               --name $databaseName
+```
+
+- Save these credentials and IDs by updating the`.env` file:
+
+  - Note: Be sure to create you collection (table) - this can be done via the portal:
+
+  ```
+  # MONGO DB CONNECTION SETTINGS
+  PRIMARY_CONNECTION_STRING=primary-connection-string
+  MONGO_DB_NAME=database-name
+  COLLECTION_NAME=your_collection_name
+
+  ```
+
+5. The project uses a virtual environment to isolate package dependencies. To create the virtual environment and install the newly added `pymongo` package, run the following from your preferred shell:
 
 ```bash
 $ poetry install
@@ -212,22 +250,31 @@ $ docker build --target test --tag todo-app:test .
 ```bash
 $ run: docker run --env-file ./.env.test todo-app:test
 ```
+
 ## Manual Deployment
+
 Find the Docker images for this project [here](https://hub.docker.com/repository/docker/funmibadev/todo-app/tags).
 
 ### Release Docker Image to DockerHub
+
 To release the Docker image to DockerHub, you first need to build the production container using the following command:
+
 ```bash
 $ docker build --target production --tag funmibadev/todo-app:dev .
 ```
+
 Then you need to push the image to docker using the following command:
+
 ```bash
 $ docker push funmibadev/todo-app:dev
 ```
+
 ### Deploy App on Azure
 
 #### Create WebApp:
+
 ##### Portal:
+
 - Create a Resource -> Web App
 - Select your Project Exercise resource group.
 - In the “Publish” field, select “Docker Container”
@@ -235,27 +282,38 @@ $ docker push funmibadev/todo-app:dev
 - On the next screen, select Docker Hub in the “Image Source” field, and enter the details of your image.
 
 ##### CLI:
+
 - First create an App Service Plan: az appservice plan create --resource-group <resource_group_name> -n <appservice_plan_name> --sku B1 --is-linux
 - Then create the Web App: az webapp create --resource-group <resource_group_name> --plan <appservice_plan_name> --name <webapp_name> --deployment-container-image-name docker.io/<dockerhub_username>/<container-image-name>:<tagname>
 
 #### Set up Environment Variables:
+
 ##### Portal:
+
 - Settings -> Configuration in the Portal
 - Add all the environment variables as “New application setting” as available in the .env file
 
 ##### CLI:
+
 - Enter them individually via az webapp config appsettings set -g <resource_group_name> -n <webapp_name> --settings FLASK_APP=todo_app/app.
 
 #### Find the Webhook URL:
+
 The Webhook URL is located under Deployment Center on the app service’s page in the Azure portal.
+
 #### Test the Webhook:
+
 Copy the webhook URL and add in a backslash to escape the `$`. Run the following command replacing `<webhook>` with the actual webhook:
+
 ```bash
 $ curl -dH -X POST "<webhook>"
 ```
+
 It should look as follows:
+
 ```bash
 $ curl -dH -X POST "https://\$<deployment_username>:<deployment_password>@<webapp_name>.scm.azurewebsites.net/docker/hook"
 ```
+
 Upon successfully triggering the webhook, you should receive a link to a log-stream related to the re-pulling of the image and restarting the app.
 Find the deployed website [here](https://funmitodoapp.azurewebsites.net/).

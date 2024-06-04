@@ -1,52 +1,49 @@
-from typing import List
 from flask import Flask, request, redirect, url_for, render_template
-from todo_app.data.trello_items import TrelloManager
-from todo_app.trello_config import TrelloConfig
+from todo_app.data.mongo_items import MongoDbManager
+from todo_app.mongo_config import MongoDBConfig
 from todo_app.views.view_model import ViewModel
+from todo_app.data.itemStatus import ItemStatus
 
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(TrelloConfig())
-    config = TrelloConfig()  # Create a single TrelloDataConfig instance
-    trello_manager = TrelloManager(config)  # Create a single TrelloManager instance
+    app.config.from_object(MongoDBConfig())
+    conf = MongoDBConfig() # Create a single MongoDataConfig instance
+    mongodb_manager = MongoDbManager(conf) # Create a single MongoDbManager instance
 
     @app.route('/')
     def index():
-        trello_items = trello_manager.get_items()
-        view_model = ViewModel(trello_items)
+        mongo_items = mongodb_manager.get_todo_items()
+        view_model = ViewModel(mongo_items)
         return render_template('index.html', view_model=view_model)
 
     @app.route('/additem', methods=['POST'])
     def additem():
         title = request.form.get('title')
         desc = request.form.get('description')
-        trello_manager.create_card(title, desc)
+        mongodb_manager.create_todo_item(title, desc)
         return redirect(url_for('index'))
 
-    @app.route('/mark_complete/<card_id>', methods=['POST'])
-    def mark_card_done(card_id):
+    @app.route('/mark_complete/<item_id>', methods=['POST'])
+    def mark_card_done(item_id):
         try:
-            list_id_done = config.TRELLO_DONE  # Replace with the desired list ID for "Done"
-            trello_manager.update_item_status(card_id, list_id_done)
+            mongodb_manager.update_todo_item_status(item_id, ItemStatus.DONE.value)
             return redirect(url_for('index'))
         except Exception as e:
-            return f"Failed to mark card complete {str(e)}"
+            return f"Failed to mark item complete {str(e)}"
 
-    @app.route('/mark_progress/<card_id>', methods=['POST'])
-    def mark_card_progress(card_id):
+    @app.route('/mark_progress/<item_id>', methods=['POST'])
+    def mark_card_progress(item_id):
         try:
-            # Replace with the desired list ID for "Progress"
-            list_id_progress = config.TRELLO_IN_PROGRESS
-            trello_manager.update_item_status(card_id, list_id_progress)
+            mongodb_manager.update_todo_item_status(item_id, ItemStatus.PROGRESS.value)
             return redirect(url_for('index'))
         except Exception as e:
-            return f"Failed to progress card status: {str(e)}"
+            return f"Failed to progress item status: {str(e)}"
 
-    @app.route('/removeitem/<card_id>', methods=['POST'])
-    def removeitem(card_id):
+    @app.route('/removeitem/<item_id>', methods=['POST'])
+    def removeitem(item_id):
         try:
-            trello_manager.delete_card(card_id)
+            mongodb_manager.delete_todo_item(item_id)
             return redirect(url_for('index'))
         except Exception as e:
             return f"Failed to delete card: {str(e)}"
